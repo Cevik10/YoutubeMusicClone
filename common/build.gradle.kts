@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    id(libs.plugins.kotlin.kapt.get().pluginId)
+
 }
 
 android {
@@ -27,14 +30,19 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    hilt {
+        enableAggregatingTask = true
+    }
 }
 
 dependencies {
 
-    implementation(libs.androidxCoreKtx)
     implementation(libs.androidxAppcompat)
-    implementation(libs.googleMaterial)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidxTestJunit)
-    androidTestImplementation(libs.androidxEspressoCore)
+    implementation(libs.javaxInject)
+    implementation(libs.bundles.hilt)
+    kapt(libs.bundles.hiltKapt)
+    annotationProcessor(libs.hiltCompiler)
+    testImplementation(libs.bundles.testing)
+    androidTestImplementation(libs.bundles.testing)
 }

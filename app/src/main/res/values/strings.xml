@@ -10,4 +10,5 @@
     <string name="cd_notifications">Notifications</string>
     <string name="cd_search">Search</string>
     <string name="cd_account">Account</string>
+    <string name="cd_play_pause">Play - Pause</string>
 </resources>

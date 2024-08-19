@@ -1,40 +1,117 @@
 package com.hakancevik.youtubemusicclone.ui.home.components
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.hakancevik.youtubemusicclone.common.Constants.CATEGORIES
+import com.hakancevik.data.model.Category
+import com.hakancevik.youtubemusicclone.R
 
 @Composable
-fun CategoriesWidget() {
-    val selectedCategory = rememberSaveable { mutableStateOf(CATEGORIES.first()) }
+fun     CategoriesWidget() {
+    val selectedCategory = rememberSaveable { mutableStateOf<Category?>(null) }
+    val lazyListState = rememberLazyListState()
+
+    // Seçili kategori değiştiğinde kaydırma işlemi
+    LaunchedEffect(selectedCategory.value) {
+        selectedCategory.value?.let { category ->
+            val index = Category.entries.indexOf(category)
+            val safeIndex = if (index > 0) index - 1 else 0
+            lazyListState.animateScrollToItem(safeIndex)
+        } ?: run {
+            // Seçili kategori yoksa, varsayılan ilk pozisyona dön
+            lazyListState.animateScrollToItem(0)
+        }
+    }
 
     LazyRow(
+        state = lazyListState,
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        items(CATEGORIES) {
-            CategoryButton(text = it, isSelected = it == selectedCategory.value) {
-                selectedCategory.value = it
+        items(Category.entries.toTypedArray()) { category ->
+            val isSelected = category == selectedCategory.value
+            CategoryButton(
+                text = category.displayName,
+                isSelected = isSelected
+            ) {
+                selectedCategory.value = if (isSelected) null else category
             }
-
         }
     }
 
+    // İçerik değişimi
+    when (selectedCategory.value) {
+        null -> HomeScreenContent() // Varsayılan içerik
+        else -> CategoryScreenContent(selectedCategory.value!!)
+    }
 }
+
+
+@Composable
+fun HomeScreenContent() {
+    SongSection(title = R.string.song_section_title) {
+        SongsGrid(onSongClick = { song -> println(song.artist) })
+    }
+}
+
+@Composable
+fun CategoryScreenContent(category: Category) {
+    when (category) {
+        Category.ROMANCE -> {
+            Text(text = "Romantic movies and music")
+        }
+
+        Category.ENERGIZE -> {
+            Text(text = "Energizing playlists to get you moving")
+        }
+
+        Category.FEEL_GOOD -> {
+            Text(text = "Feel good vibes and uplifting content")
+        }
+
+        Category.RELAX -> {
+            Text(text = "Relaxing sounds and peaceful scenes")
+        }
+
+        Category.WORKOUT -> {
+            Text(text = "Music and videos to boost your workout")
+        }
+
+        Category.SAD -> {
+            Text(text = "Songs and scenes for when you're feeling down")
+        }
+
+        Category.COMMUTE -> {
+            Text(text = "Content to enjoy on your way to work or school")
+        }
+
+        Category.PARTY -> {
+            Text(text = "Party hits and fun playlists")
+        }
+
+        Category.FOCUS -> {
+            Text(text = "Music and videos to help you concentrate")
+        }
+
+        Category.SLEEP -> {
+            Text(text = "Calm sounds and scenes to help you sleep")
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable

@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +47,7 @@ fun HomeAppBar(
 
         IconButton(onClick = onNotificationsClick) {
             Icon(
-                imageVector = Icons.Default.Notifications,
+                imageVector = Icons.Default.NotificationsNone,
                 contentDescription = stringResource(R.string.cd_notifications),
                 tint = MaterialTheme.colorScheme.onPrimary
             )

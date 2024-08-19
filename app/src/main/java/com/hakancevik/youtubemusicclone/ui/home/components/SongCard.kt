@@ -86,7 +86,7 @@ fun SongCard(
 
             IconButton(
                 onClick = { },
-                modifier = Modifier.padding(end = 8.dp),
+                modifier = Modifier.padding(end = 0.dp),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = Color.Unspecified,
                     contentColor = Color.Unspecified
