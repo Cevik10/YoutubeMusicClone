@@ -11,4 +11,7 @@
     <string name="cd_search">Search</string>
     <string name="cd_account">Account</string>
     <string name="cd_play_pause">Play - Pause</string>
+    <string name="cd_add_to_playlist">Add to playlist</string>
+    <string name="cd_down_arrow">Down arrow</string>
+    <string name="content_description">Any content description</string>
 </resources>

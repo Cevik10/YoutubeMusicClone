@@ -1,5 +1,6 @@
 package com.hakancevik.youtubemusicclone.ui.home.components
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,12 +16,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hakancevik.data.model.Category
+import com.hakancevik.domain.entity.playlistdata.TrackData
 import com.hakancevik.youtubemusicclone.R
 
 @Composable
-fun     CategoriesWidget() {
+fun CategoriesWidget(
+    tracks: List<TrackData>,
+    playlistTitle: String,
+    onTrackClick: (TrackData) -> Unit
+) {
     val selectedCategory = rememberSaveable { mutableStateOf<Category?>(null) }
     val lazyListState = rememberLazyListState()
+
+    // Back tuşu davranışını yönetme
+    BackHandler(enabled = selectedCategory.value != null) {
+        selectedCategory.value = null
+    }
 
     // Seçili kategori değiştiğinde kaydırma işlemi
     LaunchedEffect(selectedCategory.value) {
@@ -54,16 +65,20 @@ fun     CategoriesWidget() {
 
     // İçerik değişimi
     when (selectedCategory.value) {
-        null -> HomeScreenContent() // Varsayılan içerik
+        null -> HomeScreenContent(tracks, playlistTitle, onTrackClick) // Varsayılan içerik
         else -> CategoryScreenContent(selectedCategory.value!!)
     }
 }
 
 
 @Composable
-fun HomeScreenContent() {
-    SongSection(title = R.string.song_section_title) {
-        SongsGrid(onSongClick = { song -> println(song.artist) })
+fun HomeScreenContent(
+    tracks: List<TrackData>,
+    playlistTitle: String,
+    onTrackClick: (TrackData) -> Unit
+) {
+    TracksSection(title = playlistTitle) {
+        TracksGrid(tracks = tracks, onTrackClick = onTrackClick)
     }
 }
 
@@ -116,5 +131,5 @@ fun CategoryScreenContent(category: Category) {
 @Preview(showBackground = true)
 @Composable
 fun CategoriesWidgetPreview() {
-    CategoriesWidget()
+    //CategoriesWidget()
 }

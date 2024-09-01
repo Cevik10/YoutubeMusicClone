@@ -24,8 +24,8 @@ fun BottomNavigationBar(navController: NavController, modifier: Modifier = Modif
 
     NavigationBar(containerColor = Color.Black, modifier = modifier) {
         items.forEach { screen ->
-            NavigationBarItem(icon = { Icon(screen.icon, contentDescription = null) },
-                label = { Text(stringResource(screen.resourceId)) },
+            NavigationBarItem(icon = { screen.icon?.let { Icon(it, contentDescription = null) } },
+                label = { Text(screen.resourceId?.let { stringResource(it) } ?: "") },
                 selected = currentRoute == screen.route,
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = Color.Transparent,

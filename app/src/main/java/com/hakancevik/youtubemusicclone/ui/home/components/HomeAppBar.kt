@@ -41,6 +41,7 @@ fun HomeAppBar(
                 modifier = Modifier.size(24.dp)  // Set the size of the icon (adjust the size as needed)
             )
         }
+
         Text(text = "Music", modifier = Modifier.align(Alignment.CenterVertically), color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.titleLarge)
 
         Spacer(Modifier.weight(1f))

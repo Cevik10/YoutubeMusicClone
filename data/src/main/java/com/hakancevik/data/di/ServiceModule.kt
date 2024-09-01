@@ -1,6 +1,7 @@
 package com.hakancevik.data.di
 
 import com.hakancevik.data.api.PlaylistApiService
+import com.hakancevik.data.api.TrackApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,6 +17,13 @@ internal object ServiceModule {
     @Singleton
     fun providePlaylistApiService(retrofit: Retrofit): PlaylistApiService {
         return retrofit.create(PlaylistApiService::class.java)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideTrackApiService(retrofit: Retrofit): TrackApiService {
+        return retrofit.create(TrackApiService::class.java)
     }
 
 }

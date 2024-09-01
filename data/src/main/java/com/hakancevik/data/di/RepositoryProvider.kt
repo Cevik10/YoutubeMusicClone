@@ -1,7 +1,9 @@
 package com.hakancevik.data.di
 
 import com.hakancevik.data.datasource.musicplayer.PlaylistRepositoryImpl
+import com.hakancevik.data.datasource.musicplayer.TrackRepositoryImpl
 import com.hakancevik.domain.repository.PlaylistRepository
+import com.hakancevik.domain.repository.TrackRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,5 +17,10 @@ abstract class RepositoryProvider {
     abstract fun bindPlaylistRepository(
         playlistRepositoryImpl: PlaylistRepositoryImpl
     ): PlaylistRepository
+
+    @Binds
+    abstract fun bindTrackRepository(
+        trackRepositoryImpl: TrackRepositoryImpl
+    ): TrackRepository
 
 }

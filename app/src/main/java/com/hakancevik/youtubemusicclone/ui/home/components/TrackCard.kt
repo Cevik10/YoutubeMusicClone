@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,14 +25,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.hakancevik.data.model.Song
+import com.hakancevik.domain.entity.playlistdata.AlbumData
+import com.hakancevik.domain.entity.playlistdata.ArtistData
+import com.hakancevik.domain.entity.playlistdata.TrackData
 import com.hakancevik.youtubemusicclone.R
 import com.hakancevik.youtubemusicclone.common.theme.AppTheme
 import com.hakancevik.youtubemusicclone.common.widgets.DynamicAsyncImage
 
 @Composable
-fun SongCard(
-    song: Song,
+fun TrackCard(
+    track: TrackData,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {} // Added parameter for click handling
 ) {
@@ -49,7 +50,7 @@ fun SongCard(
         ) {
 
             DynamicAsyncImage(
-                imageUrl = song.coverUrl,
+                imageUrl = track.album.coverMedium,
                 contentDescription = "",
                 isCircular = false,
                 modifier = Modifier
@@ -67,7 +68,7 @@ fun SongCard(
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = song.title,
+                    text = track.title,
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2,
@@ -75,7 +76,7 @@ fun SongCard(
                 )
 
                 Text(
-                    text = song.artist,
+                    text = track.artist.name,
                     color = MaterialTheme.colorScheme.tertiaryContainer,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
@@ -105,9 +106,9 @@ fun SongCard(
 
 @Preview
 @Composable
-fun SongCardPreview() {
+fun TrackCardPreview() {
     AppTheme {
-        SongCard(Song("1", "title", "artist", "album", "https://i.ibb.co/vkynLfY/Whats-App-Image-2023-08-02-at-01-00-56.jpg", 120))
+        TrackCard(TrackData("1", "title", "artist", ArtistData("1", "John kennedy"), AlbumData("1", "album title", "https://e-cdns-images.dzcdn.net/images/cover/c65b3bd84e81056e060be144381c06c8/250x250-000000-80-0-0.jpg")))
     }
 
 }

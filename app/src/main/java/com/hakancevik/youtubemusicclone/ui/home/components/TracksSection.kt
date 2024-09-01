@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,11 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hakancevik.youtubemusicclone.R
-import com.hakancevik.youtubemusicclone.common.theme.AppTheme
 
 @Composable
-fun SongSection(
-    @StringRes title: Int,
+fun TracksSection(
+    title: String,
     modifier: Modifier = Modifier,
     onPlayAllClick: () -> Unit = {},
     content: @Composable () -> Unit
@@ -45,7 +42,7 @@ fun SongSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(title),
+                text = title,
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
 
@@ -71,14 +68,14 @@ fun SongSection(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SongSectionPreview() {
-    SongSection(title = R.string.song_section_title) {
-        SongsGrid()
-    }
-
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun SongSectionPreview() {
+//    SongSection(title = R.string.song_section_title) {
+//        //SongsGrid()
+//    }
+//
+//}
 
 
 

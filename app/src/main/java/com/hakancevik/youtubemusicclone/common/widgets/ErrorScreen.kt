@@ -42,7 +42,7 @@ fun ErrorScreen(message: String) {
                 text = message,
                 style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onError),
                 textAlign = TextAlign.Center,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

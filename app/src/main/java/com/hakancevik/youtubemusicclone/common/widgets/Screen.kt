@@ -12,10 +12,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.hakancevik.youtubemusicclone.R
 
 
-sealed class Screen(val route: String, val icon: ImageVector, @StringRes val resourceId: Int) {
+sealed class Screen(val route: String, val icon: ImageVector?, @StringRes val resourceId: Int?) {
     data object Home : Screen("home", Icons.Filled.Home, R.string.title_home)
     data object Samples : Screen("samples", Icons.Filled.FormatIndentDecrease, R.string.title_samples)
     data object Explore : Screen("explore", Icons.Filled.Explore, R.string.title_explore)
     data object Library : Screen("library", Icons.Filled.LibraryBooks, R.string.title_library)
+    data object TrackDetail : Screen("trackDetail", null, null) {
+        fun createRoute(trackId: String) = "$route/$trackId"
+    }
 }
 

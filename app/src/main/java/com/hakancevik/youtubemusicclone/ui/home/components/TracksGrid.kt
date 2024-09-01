@@ -10,15 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
-import com.hakancevik.data.model.Song
+import com.hakancevik.domain.entity.playlistdata.TrackData
 import com.hakancevik.youtubemusicclone.common.theme.AppTheme
-import com.hakancevik.youtubemusicclone.common.widgets.mockSongList
 
 @Composable
-fun SongsGrid(
+fun TracksGrid(
+    tracks: List<TrackData>,
     modifier: Modifier = Modifier,
-    onSongClick: (Song) -> Unit = {} // Added parameter for click handling
+    onTrackClick: (TrackData) -> Unit = {} // Added parameter for click handling
 ) {
     LazyHorizontalGrid(
         rows = GridCells.Fixed(4),
@@ -27,18 +26,19 @@ fun SongsGrid(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.height((168 * 2 - 24).dp)
     ) {
-        items(mockSongList) { songItem ->
-            SongCard(
-                song = songItem,
-                onClick = { onSongClick(songItem) } // Pass the click action
+        items(tracks) { trackData ->
+            TrackCard(
+                track = trackData,
+                onClick = { onTrackClick(trackData) } // Pass the click action
             )
         }
     }
 }
-@Preview
-@Composable
-fun SongsGridPreview() {
-    AppTheme {
-        SongsGrid()
-    }
-}
+
+//@Preview
+//@Composable
+//fun SongsGridPreview() {
+//    AppTheme {
+//        //SongsGrid()
+//    }
+//}
