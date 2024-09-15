@@ -21,16 +21,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.hakancevik.data.model.track.Track
+import com.hakancevik.data.model.track.TrackDTO
+import com.hakancevik.domain.entity.trackdata.TrackData
 import com.hakancevik.youtubemusicclone.ui.musicplayer.service.MusicPlayerService
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MusicPlayerDetailBottomSheet(
+    trackData: TrackData,
     serviceBinder: MusicPlayerService.MusicServiceBinder?,
     bottomSheetWidgetBounds: MutableState<Float?>,
-    track: Track,
     modifier: Modifier = Modifier
 ) {
     val sheetState = rememberModalBottomSheetState(
@@ -50,16 +51,17 @@ fun MusicPlayerDetailBottomSheet(
     }) {
         MusicPlayerBottomWidget(modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 80.dp, start = 8.dp, end = 8.dp)
+            .padding(start = 8.dp, end = 8.dp)
+            //.padding(bottom = 80.dp, start = 8.dp, end = 8.dp)
             .height(65.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.onTertiary)
             .clickable {
                 coroutineScope.launch { sheetState.show() }
             },
-            imageUrl = track.albumData.coverMediumUrl ?: "https://fastly.picsum.photos/id/626/200/300.jpg?hmac=8P_lvCUkxcubJb1bckQk2YQymRoW6JdkOgtL4ThZMjw",
-            title = track.title,
-            singer = track.artistData.name,
+            imageUrl = trackData.album?.coverMediumUrl ?: "https://fastly.picsum.photos/id/626/200/300.jpg?hmac=8P_lvCUkxcubJb1bckQk2YQymRoW6JdkOgtL4ThZMjw",
+            title = trackData.title ?: "song title",
+            singer = trackData.artist?.name ?: "singer name",
             serviceBinder = serviceBinder,
             onPlayPauseClicked = { action ->
                 val intent = Intent(context, MusicPlayerService::class.java).apply {

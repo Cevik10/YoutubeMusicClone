@@ -1,7 +1,7 @@
 package com.hakancevik.domain.entity.trackdata
 
 data class AlbumData(
-    val coverUrl: String?,  // Make coverUrl nullable
+    val coverUrl: String?,  // Nullable
     val coverBigUrl: String?,
     val coverMediumUrl: String?,
     val coverSmallUrl: String?,

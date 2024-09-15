@@ -1,10 +1,11 @@
 package com.hakancevik.domain.entity.trackdata
 
+
 data class ArtistData(
     val id: String,
-    val link: String,
+    val link: String?,
     val name: String,
-    val pictureUrl: String?,  // Make pictureUrl nullable
+    val pictureUrl: String?,  // Nullable
     val pictureBigUrl: String?,
     val pictureMediumUrl: String?,
     val pictureSmallUrl: String?,
@@ -12,5 +13,5 @@ data class ArtistData(
     val isRadio: Boolean,
     val shareUrl: String?,
     val tracklistUrl: String?,
-    val type: String
+    val type: String?
 )

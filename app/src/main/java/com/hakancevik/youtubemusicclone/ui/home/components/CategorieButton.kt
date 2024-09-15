@@ -47,6 +47,7 @@ fun CategoryButton(
 @Preview(showBackground = true)
 @Composable
 fun CategoryButtonPreview() {
+
     CategoryButton(text = "Romance", isSelected = true, onClick = {})
 
 }

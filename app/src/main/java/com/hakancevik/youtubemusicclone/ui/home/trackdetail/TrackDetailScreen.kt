@@ -31,6 +31,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -45,13 +47,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.hakancevik.domain.entity.MediaPlayerState
+import com.hakancevik.domain.entity.ResultData
 import com.hakancevik.youtubemusicclone.R
 import com.hakancevik.youtubemusicclone.common.Constants
 import com.hakancevik.youtubemusicclone.common.dpToPx
 import com.hakancevik.youtubemusicclone.common.pxToDp
 import com.hakancevik.youtubemusicclone.common.theme.AppTheme
 import com.hakancevik.youtubemusicclone.common.widgets.DynamicAsyncImage
+import com.hakancevik.youtubemusicclone.common.widgets.LoadingScreen
+import com.hakancevik.youtubemusicclone.ui.home.createDummyTrack
 import com.hakancevik.youtubemusicclone.ui.home.trackdetail.components.AnimatedPlayPauseIcon
 import com.hakancevik.youtubemusicclone.ui.home.trackdetail.components.SliderSeekBar
 import com.hakancevik.youtubemusicclone.ui.home.trackdetail.components.SongInformationWidget
@@ -67,47 +73,83 @@ fun TrackDetailScreen(
     context: Context = LocalContext.current,
     sheetState: ModalBottomSheetState,
     coroutineScope: CoroutineScope,
-    bottomSheetWidgetBounds: MutableState<Float?>
-) {
-    Log.d(
-        "MockUsage",
-        "Since the application is a mock application, data is received with the mock, without using the clicked $trackId."
-    )
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .onGloballyPositioned { coordinates ->
-            val toDp = pxToDp(context = context, coordinates.boundsInRoot().top)
+    bottomSheetWidgetBounds: MutableState<Float?>,
+    viewModel: TrackDetailViewModel = hiltViewModel(),
 
-            if (toDp != 0f) {
-                bottomSheetWidgetBounds.value = toDp
+    ) {
+
+    LaunchedEffect(trackId) {
+        viewModel.getTrack(trackId)
+    }
+
+    val trackState by viewModel.trackState.collectAsState()
+
+    when (val result = trackState) {
+        is ResultData.Loading -> {
+            // Display a loading indicator
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                LoadingScreen()
             }
         }
-        .background(
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    MaterialTheme.colorScheme.onTertiary,
-                    MaterialTheme.colorScheme.onSurface,
-                    MaterialTheme.colorScheme.background
-                ), startY = Constants.DEFAULT_VALUE, endY = dpToPx(context, 1200f).toFloat()
+
+        is ResultData.Success -> {
+            val track = result.data
+            Log.d(
+                "TrackDetailScreen",
+                "Displaying details for trackId: $trackId with title: ${track.title}"
             )
-        )) {
-        Column {
-            PlayerDetailTopToolbar(sheetState, coroutineScope)
-            Spacer(modifier = Modifier.height(12.dp))
-            DynamicAsyncImage(
-                imageUrl = "https://picsum.photos/200/300",
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
-                    .clip(RoundedCornerShape(12.dp))
-            )
-            Spacer(modifier = Modifier.height(40.dp))
-            SongInformationWidget()
-            SliderSeekBar(serviceBinder)
-            ActionButtons(serviceBinder)
+
+
+            // START TRACK
+
+            // Display track details
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .onGloballyPositioned { coordinates ->
+                    val toDp = pxToDp(context = context, coordinates.boundsInRoot().top)
+
+                    if (toDp != 0f) {
+                        bottomSheetWidgetBounds.value = toDp
+                    }
+                }
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.onTertiary,
+                            MaterialTheme.colorScheme.onSurface,
+                            MaterialTheme.colorScheme.background
+                        ), startY = Constants.DEFAULT_VALUE, endY = dpToPx(context, 1200f).toFloat()
+                    )
+                )) {
+                Column {
+                    PlayerDetailTopToolbar(sheetState, coroutineScope)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    DynamicAsyncImage(
+                        imageUrl = track.album?.coverMediumUrl
+                            ?: "https://picsum.photos/200/300", // Use the track's image
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                    Spacer(modifier = Modifier.height(40.dp))
+                    SongInformationWidget(track) // Pass track data to display
+                    SliderSeekBar(serviceBinder)
+                    ActionButtons(serviceBinder, track.previewUrl ?: "https://docs.google.com/uc?export=open&id=1IBdOyBPy9BO2TFcDTi1wCBk9EcacbKv0")
+                }
+            }
+        }
+
+        is ResultData.Error -> {
+            // Handle error state
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Error loading track: ${result.exception.message}")
+            }
         }
     }
+
+
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -153,7 +195,7 @@ fun PlayerDetailTopToolbar(sheetState: ModalBottomSheetState, coroutineScope: Co
 }
 
 @Composable
-fun ActionButtons(serviceBinder: MusicPlayerService.MusicServiceBinder?) {
+fun ActionButtons(serviceBinder: MusicPlayerService.MusicServiceBinder?, trackUrl: String) {
     val playerState = remember { mutableStateOf(MediaPlayerState.STOPPED) }
     val context = LocalContext.current
 
@@ -162,6 +204,7 @@ fun ActionButtons(serviceBinder: MusicPlayerService.MusicServiceBinder?) {
             playerState.value = state
         }
     }
+
     Row {
         Icon(
             imageVector = Icons.Filled.Shuffle,
@@ -186,6 +229,7 @@ fun ActionButtons(serviceBinder: MusicPlayerService.MusicServiceBinder?) {
         AnimatedPlayPauseIcon(playerState, onPlayPauseClicked = { action ->
             val intent = Intent(context, MusicPlayerService::class.java).apply {
                 this.action = action
+                putExtra("TRACK_URL", trackUrl)
             }
             context.startService(intent)
         })
@@ -216,7 +260,7 @@ fun ActionButtons(serviceBinder: MusicPlayerService.MusicServiceBinder?) {
 @Composable
 fun SongInformationWidgetPreview() {
     AppTheme {
-        SongInformationWidget()
+        //SongInformationWidget()
     }
 }
 
@@ -247,7 +291,7 @@ fun SliderSeekBarPreview() {
 @Composable
 fun ActionButtonsPreview() {
     AppTheme {
-        ActionButtons(null)
+        ActionButtons(null, "https://docs.google.com/uc?export=open&id=1IBdOyBPy9BO2TFcDTi1wCBk9EcacbKv0")
     }
 }
 

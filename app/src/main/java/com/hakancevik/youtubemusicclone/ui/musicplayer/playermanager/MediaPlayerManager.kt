@@ -29,9 +29,10 @@ class MediaPlayerManager : PlaybackControl, PlaybackInteraction {
         startUpdatingCurrentPosition()
     }
 
-    fun initializeMediaPlayer(mediaSession: MediaSessionCompat?) {
+    fun initializeMediaPlayer(mediaSession: MediaSessionCompat?, url: String) {
+        mediaPlayer?.release() // Release any existing player to avoid conflicts
         mediaPlayer = MediaPlayer().apply {
-            setDataSource("https://docs.google.com/uc?export=open&id=1IBdOyBPy9BO2TFcDTi1wCBk9EcacbKv0")
+            setDataSource(url) // Use dynamic URL here
             prepare()
             setOnCompletionListener {
                 pausePlayback()
@@ -87,11 +88,114 @@ class MediaPlayerManager : PlaybackControl, PlaybackInteraction {
         val position = mediaPlayer?.currentPosition?.toLong() ?: 0L
         val playbackSpeed = if (mediaPlayer?.isPlaying == true) 1.0f else 0f
 
-        val mPlaybackState =
-            PlaybackStateCompat.Builder().setState(state, position, playbackSpeed).setActions(
-                PlaybackStateCompat.ACTION_PLAY or PlaybackStateCompat.ACTION_PAUSE or PlaybackStateCompat.ACTION_SKIP_TO_NEXT or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or PlaybackStateCompat.ACTION_SEEK_TO
-            ).build()
+        val mPlaybackState = PlaybackStateCompat.Builder().setState(state, position, playbackSpeed).setActions(
+            PlaybackStateCompat.ACTION_PLAY or PlaybackStateCompat.ACTION_PAUSE or PlaybackStateCompat.ACTION_SKIP_TO_NEXT or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or PlaybackStateCompat.ACTION_SEEK_TO
+        ).build()
 
         mediaSession?.setPlaybackState(mPlaybackState)
     }
 }
+
+
+//
+//class MediaPlayerManager : PlaybackControl, PlaybackInteraction {
+//    private var mediaPlayer: MediaPlayer? = null
+//    private var mediaSession: MediaSessionCompat? = null
+//    private val _playerState = MutableStateFlow(MediaPlayerState.STOPPED)
+//    val playerState: StateFlow<MediaPlayerState> = _playerState
+//
+//    private val _currentPosition = MutableStateFlow(0)
+//    val currentPosition: StateFlow<Int> = _currentPosition
+//
+//    val duration: Int?
+//        get() = mediaPlayer?.duration
+//
+//    init {
+//        startUpdatingCurrentPosition()
+//    }
+//
+//    fun initializeMediaPlayer(mediaSession: MediaSessionCompat?) {
+//        this.mediaSession = mediaSession
+//    }
+//
+//    fun startPlayback(trackUrl: String) {
+//        mediaPlayer?.release() // Release any existing media player
+//        mediaPlayer = MediaPlayer().apply {
+//            setDataSource(trackUrl)
+//            prepare()
+//            setOnCompletionListener {
+//                pausePlayback()
+//            }
+//            start()
+//            _playerState.value = MediaPlayerState.PLAYING
+//        }
+//        updatePlaybackState()
+//    }
+//
+//    override fun startPlayback() {
+//        mediaPlayer?.start()
+//        _playerState.value = MediaPlayerState.PLAYING
+//        updatePlaybackState()
+//    }
+//
+//    override fun pausePlayback() {
+//        mediaPlayer?.pause()
+//        _playerState.value = MediaPlayerState.PAUSED
+//        updatePlaybackState()
+//    }
+//
+//    override fun stopPlayback() {
+//        mediaPlayer?.stop()
+//        _playerState.value = MediaPlayerState.STOPPED
+//        updatePlaybackState()
+//    }
+//
+//    override fun releasePlayback() {
+//        mediaPlayer?.release()
+//        mediaPlayer = null
+//    }
+//
+//    override fun seekTo(position: Long) {
+//        mediaPlayer?.seekTo(position.toInt())
+//        _currentPosition.value = position.toInt()
+//        updatePlaybackState()
+//    }
+//
+//    private fun startUpdatingCurrentPosition() {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            while (isActive) {
+//                delay(1000)
+//                mediaPlayer?.let {
+//                    val currentPosition = it.currentPosition
+//                    this@MediaPlayerManager._currentPosition.value = currentPosition
+//                    updatePlaybackState()
+//                }
+//            }
+//        }
+//    }
+//
+//    override fun updatePlaybackState() {
+//        val state = if (mediaPlayer?.isPlaying == true) {
+//            PlaybackStateCompat.STATE_PLAYING
+//        } else {
+//            PlaybackStateCompat.STATE_PAUSED
+//        }
+//
+//        val position = mediaPlayer?.currentPosition?.toLong() ?: 0L
+//        val playbackSpeed = if (mediaPlayer?.isPlaying == true) 1.0f else 0f
+//
+//        val playbackState = PlaybackStateCompat.Builder()
+//            .setState(state, position, playbackSpeed)
+//            .setActions(
+//                PlaybackStateCompat.ACTION_PLAY or
+//                        PlaybackStateCompat.ACTION_PAUSE or
+//                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+//                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+//                        PlaybackStateCompat.ACTION_SEEK_TO
+//            )
+//            .build()
+//
+//        mediaSession?.setPlaybackState(playbackState)
+//    }
+//}
+

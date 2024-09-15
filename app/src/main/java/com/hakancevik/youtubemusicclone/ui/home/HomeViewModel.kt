@@ -16,18 +16,51 @@ class HomeViewModel @Inject constructor(
     private val getPlaylistUseCase: GetPlaylistUseCase
 ) : ViewModel() {
 
-    private val _playlist = MutableStateFlow<ResultData<PlaylistData>>(ResultData.Loading())
-    val playlist: StateFlow<ResultData<PlaylistData>> = _playlist
+    private val _playlistState = MutableStateFlow<PlaylistUiState>(PlaylistUiState.Loading)
+    val playlistState: StateFlow<PlaylistUiState> = _playlistState
+
+    private val _listenAgainTracksState = MutableStateFlow<ListenAgainTracksUiState>(ListenAgainTracksUiState.Loading)
+    val listenAgainTracksState: StateFlow<ListenAgainTracksUiState> = _listenAgainTracksState
 
     init {
         fetchPlaylist("908622995")
+        fetchListenAgainTracks("908622995")
     }
 
-    fun fetchPlaylist(id: String) {
+    private fun fetchPlaylist(id: String) {
         viewModelScope.launch {
-            getPlaylistUseCase(id).collect {
-                _playlist.value = it
+            getPlaylistUseCase(id).collect { result ->
+                _playlistState.value = when (result) {
+                    is ResultData.Loading -> PlaylistUiState.Loading
+                    is ResultData.Success -> PlaylistUiState.Success(result.data)
+                    is ResultData.Error -> PlaylistUiState.Error(result.exception)
+                }
             }
         }
     }
+
+    private fun fetchListenAgainTracks(id: String) {
+        viewModelScope.launch {
+            getPlaylistUseCase(id).collect { result ->
+                _listenAgainTracksState.value = when (result) {
+                    is ResultData.Loading -> ListenAgainTracksUiState.Loading
+                    is ResultData.Success -> ListenAgainTracksUiState.Success(result.data)
+                    is ResultData.Error -> ListenAgainTracksUiState.Error(result.exception)
+                }
+            }
+        }
+    }
+}
+
+
+sealed interface PlaylistUiState {
+    data object Loading : PlaylistUiState
+    data class Success(val playlist: PlaylistData) : PlaylistUiState
+    data class Error(val exception: Throwable) : PlaylistUiState
+}
+
+sealed interface ListenAgainTracksUiState {
+    data object Loading : ListenAgainTracksUiState
+    data class Success(val tracks: PlaylistData) : ListenAgainTracksUiState
+    data class Error(val exception: Throwable) : ListenAgainTracksUiState
 }

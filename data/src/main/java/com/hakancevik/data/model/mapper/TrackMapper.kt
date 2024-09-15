@@ -1,7 +1,10 @@
 package com.hakancevik.data.model.mapper
 
 
-import com.hakancevik.data.model.track.Track
+import com.hakancevik.data.model.track.AlbumDTO
+import com.hakancevik.data.model.track.ArtistDTO
+import com.hakancevik.data.model.track.ContributorDTO
+import com.hakancevik.data.model.track.TrackDTO
 import com.hakancevik.domain.entity.trackdata.AlbumData
 import com.hakancevik.domain.entity.trackdata.ArtistData
 import com.hakancevik.domain.entity.trackdata.ContributorData
@@ -9,85 +12,105 @@ import com.hakancevik.domain.entity.trackdata.TrackData
 
 object TrackMapper {
 
-    fun mapToDomain(track: Track): TrackData {
+    fun mapToDomain(trackDTO: TrackDTO): TrackData {
         return TrackData(
-            album = mapAlbumToDomain(track.albumData),
-            artist = mapArtistToDomain(track.artistData),
-            availableCountries = track.availableCountries ?: emptyList(), // Safe null handling
-            beatsPerMinute = track.beatsPerMinute,
-            contributors = track.contributorData?.map { mapContributorToDomain(it) } ?: emptyList(), // Safe null handling
-            diskNumber = track.diskNumber,
-            duration = track.duration,
-            explicitContentCover = track.explicitContentCover,
-            explicitContentLyrics = track.explicitContentLyrics,
-            isExplicit = track.isExplicit,
-            gain = track.gain,
-            id = track.id,
-            isrc = track.isrc,
-            link = track.link,
-            imageHash = track.imageHash,
-            previewUrl = track.preview,
-            rank = track.rank,
-            isReadable = track.isReadable,
-            releaseDate = track.releaseDate,
-            shareUrl = track.share,
-            title = track.title,
-            shortTitle = track.shortTitle,
-            position = track.trackPosition,
-            token = track.trackToken,
-            type = track.type
+            album = trackDTO.albumData?.let { mapAlbumToDomain(it) },
+            artist = trackDTO.artistData?.let { mapArtistToDomain(it) },
+            availableCountries = trackDTO.availableCountries ?: emptyList(),
+            beatsPerMinute = trackDTO.beatsPerMinute,
+            contributors = trackDTO.contributorData?.map { mapContributorToDomain(it) } ?: emptyList(),
+            diskNumber = trackDTO.diskNumber,
+            duration = trackDTO.duration,
+            explicitContentCover = trackDTO.explicitContentCover,
+            explicitContentLyrics = trackDTO.explicitContentLyrics,
+            isExplicit = trackDTO.isExplicit,
+            gain = trackDTO.gain,
+            id = trackDTO.id,
+            isrc = trackDTO.isrc,
+            link = trackDTO.link,
+            imageHash = trackDTO.imageHash,
+            previewUrl = trackDTO.preview,
+            rank = trackDTO.rank,
+            isReadable = trackDTO.isReadable,
+            releaseDate = trackDTO.releaseDate,
+            shareUrl = trackDTO.share,
+            title = trackDTO.title,
+            shortTitle = trackDTO.shortTitle,
+            position = trackDTO.trackPosition,
+            token = trackDTO.trackToken,
+            type = trackDTO.type
         )
     }
 
-    private fun mapAlbumToDomain(album: AlbumData): AlbumData {
-        return AlbumData(
-            coverUrl = album.coverUrl ?: "",  // Provide a default value if coverUrl is null
-            coverBigUrl = album.coverBigUrl,
-            coverMediumUrl = album.coverMediumUrl,
-            coverSmallUrl = album.coverSmallUrl,
-            coverXlUrl = album.coverXlUrl,
-            id = album.id,
-            link = album.link,
-            md5Image = album.md5Image,
-            releaseDate = album.releaseDate,
-            title = album.title,
-            tracklistUrl = album.tracklistUrl,
-            type = album.type
-        )
+    private fun mapAlbumToDomain(albumDTO: AlbumDTO?): AlbumData? {
+        return albumDTO?.let {
+            AlbumData(
+                coverUrl = it.cover ?: "",
+                coverBigUrl = it.coverBig,
+                coverMediumUrl = it.coverMedium,
+                coverSmallUrl = it.coverSmall,
+                coverXlUrl = it.coverXl,
+                id = it.id,
+                link = it.link,
+                md5Image = it.md5Image,
+                releaseDate = it.releaseDate,
+                title = it.title,
+                tracklistUrl = it.tracklist,
+                type = it.type
+            )
+        }
     }
 
-    private fun mapArtistToDomain(artist: ArtistData): ArtistData {
-        return ArtistData(
-            id = artist.id,
-            link = artist.link,
-            name = artist.name,
-            pictureUrl = artist.pictureUrl ?: "",  // Provide a default value if pictureUrl is null
-            pictureBigUrl = artist.pictureBigUrl ?: "",
-            pictureMediumUrl = artist.pictureMediumUrl ?: "",
-            pictureSmallUrl = artist.pictureSmallUrl ?: "",
-            pictureXlUrl = artist.pictureXlUrl ?: "",
-            isRadio = artist.isRadio,
-            shareUrl = artist.shareUrl ?: "",
-            tracklistUrl = artist.tracklistUrl ?: "",
-            type = artist.type
-        )
+    private fun mapArtistToDomain(artistDTO: ArtistDTO?): ArtistData? {
+        return artistDTO?.let {
+            ArtistData(
+                id = it.id,
+                link = it.link,
+                name = it.name,
+                pictureUrl = it.picture,
+                pictureBigUrl = it.pictureBig,
+                pictureMediumUrl = it.pictureMedium,
+                pictureSmallUrl = it.pictureSmall,
+                pictureXlUrl = it.pictureXl,
+                isRadio = it.isRadio,
+                shareUrl = it.share,
+                tracklistUrl = it.tracklist,
+                type = it.type
+            )
+        }
     }
 
-    private fun mapContributorToDomain(contributor: ContributorData): ContributorData {
-        return ContributorData(
-            id = contributor.id,
-            link = contributor.link,
-            name = contributor.name,
-            pictureUrl = contributor.pictureUrl,
-            pictureBigUrl = contributor.pictureBigUrl,
-            pictureMediumUrl = contributor.pictureMediumUrl,
-            pictureSmallUrl = contributor.pictureSmallUrl,
-            pictureXlUrl = contributor.pictureXlUrl,
-            isRadio = contributor.isRadio,
-            role = contributor.role,
-            shareUrl = contributor.shareUrl,
-            tracklistUrl = contributor.tracklistUrl,
-            type = contributor.type
+    private fun mapContributorToDomain(contributorDTO: ContributorDTO?): ContributorData {
+        return contributorDTO?.let {
+            ContributorData(
+                id = it.id,
+                link = it.link,
+                name = it.name,
+                pictureUrl = it.picture,
+                pictureBigUrl = it.pictureBig,
+                pictureMediumUrl = it.pictureMedium,
+                pictureSmallUrl = it.pictureSmall,
+                pictureXlUrl = it.pictureXl,
+                isRadio = it.isRadio,
+                role = it.role,
+                shareUrl = it.share,
+                tracklistUrl = it.tracklist,
+                type = it.type
+            )
+        } ?: ContributorData(
+            id = 0,
+            link = "",
+            name = "",
+            pictureUrl = "",
+            pictureBigUrl = "",
+            pictureMediumUrl = "",
+            pictureSmallUrl = "",
+            pictureXlUrl = "",
+            isRadio = false,
+            role = "",
+            shareUrl = "",
+            tracklistUrl = "",
+            type = ""
         )
     }
 }

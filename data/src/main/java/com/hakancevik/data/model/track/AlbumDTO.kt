@@ -2,7 +2,7 @@ package com.hakancevik.data.model.track
 
 import com.google.gson.annotations.SerializedName
 
-data class Album(
+data class AlbumDTO(
     @SerializedName("cover")
     val cover: String,
 

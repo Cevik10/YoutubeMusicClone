@@ -5,12 +5,12 @@ import com.hakancevik.domain.entity.trackdata.AlbumData
 import com.hakancevik.domain.entity.trackdata.ArtistData
 import com.hakancevik.domain.entity.trackdata.ContributorData
 
-data class Track(
+data class TrackDTO(
     @SerializedName("album")
-    val albumData: AlbumData,
+    val albumData: AlbumDTO,
 
     @SerializedName("artist")
-    val artistData: ArtistData,
+    val artistData: ArtistDTO,
 
     @SerializedName("available_countries")
     val availableCountries: List<String>,
@@ -19,7 +19,7 @@ data class Track(
     val beatsPerMinute: Double,
 
     @SerializedName("contributor")
-    val contributorData: List<ContributorData>,
+    val contributorData: List<ContributorDTO>,
 
     @SerializedName("disk_number")
     val diskNumber: Int,

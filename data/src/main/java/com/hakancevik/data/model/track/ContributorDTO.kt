@@ -2,9 +2,9 @@ package com.hakancevik.data.model.track
 
 import com.google.gson.annotations.SerializedName
 
-data class Artist(
+data class ContributorDTO(
     @SerializedName("id")
-    val id: String,
+    val id: Int,
 
     @SerializedName("link")
     val link: String,
@@ -29,6 +29,9 @@ data class Artist(
 
     @SerializedName("radio")
     val isRadio: Boolean,
+
+    @SerializedName("role")
+    val role: String,
 
     @SerializedName("share")
     val share: String,
