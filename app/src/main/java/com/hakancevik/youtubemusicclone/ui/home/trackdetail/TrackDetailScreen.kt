@@ -74,10 +74,8 @@ fun TrackDetailScreen(
     sheetState: ModalBottomSheetState,
     coroutineScope: CoroutineScope,
     bottomSheetWidgetBounds: MutableState<Float?>,
-    viewModel: TrackDetailViewModel = hiltViewModel(),
-
-    ) {
-
+    viewModel: TrackDetailViewModel = hiltViewModel()
+) {
     LaunchedEffect(trackId) {
         viewModel.getTrack(trackId)
     }
@@ -86,7 +84,6 @@ fun TrackDetailScreen(
 
     when (val result = trackState) {
         is ResultData.Loading -> {
-            // Display a loading indicator
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 LoadingScreen()
             }
@@ -99,34 +96,44 @@ fun TrackDetailScreen(
                 "Displaying details for trackId: $trackId with title: ${track.title}"
             )
 
-
-            // START TRACK
+            // Auto-start playback when track is loaded
+            LaunchedEffect(track.previewUrl) {
+                val trackUrl = track.previewUrl
+                    ?: "https://docs.google.com/uc?export=open&id=1IBdOyBPy9BO2TFcDTi1wCBk9EcacbKv0"
+                val intent = Intent(context, MusicPlayerService::class.java).apply {
+                    action = MusicPlayerService.ACTION_PLAY
+                    putExtra("TRACK_URL", trackUrl)
+                }
+                context.startService(intent)
+            }
 
             // Display track details
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .onGloballyPositioned { coordinates ->
-                    val toDp = pxToDp(context = context, coordinates.boundsInRoot().top)
-
-                    if (toDp != 0f) {
-                        bottomSheetWidgetBounds.value = toDp
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .onGloballyPositioned { coordinates ->
+                        val toDp = pxToDp(context = context, coordinates.boundsInRoot().top)
+                        if (toDp != 0f) {
+                            bottomSheetWidgetBounds.value = toDp
+                        }
                     }
-                }
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.onTertiary,
-                            MaterialTheme.colorScheme.onSurface,
-                            MaterialTheme.colorScheme.background
-                        ), startY = Constants.DEFAULT_VALUE, endY = dpToPx(context, 1200f).toFloat()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.onTertiary,
+                                MaterialTheme.colorScheme.onSurface,
+                                MaterialTheme.colorScheme.background
+                            ),
+                            startY = Constants.DEFAULT_VALUE,
+                            endY = dpToPx(context, 1200f).toFloat()
+                        )
                     )
-                )) {
+            ) {
                 Column {
                     PlayerDetailTopToolbar(sheetState, coroutineScope)
                     Spacer(modifier = Modifier.height(12.dp))
                     DynamicAsyncImage(
-                        imageUrl = track.album?.coverMediumUrl
-                            ?: "https://picsum.photos/200/300", // Use the track's image
+                        imageUrl = track.album?.coverMediumUrl ?: "https://picsum.photos/200/300",
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -134,22 +141,20 @@ fun TrackDetailScreen(
                             .clip(RoundedCornerShape(12.dp))
                     )
                     Spacer(modifier = Modifier.height(40.dp))
-                    SongInformationWidget(track) // Pass track data to display
+                    SongInformationWidget(track)
                     SliderSeekBar(serviceBinder)
-                    ActionButtons(serviceBinder, track.previewUrl ?: "https://docs.google.com/uc?export=open&id=1IBdOyBPy9BO2TFcDTi1wCBk9EcacbKv0")
+                    ActionButtons(serviceBinder, track.previewUrl
+                        ?: "https://docs.google.com/uc?export=open&id=1IBdOyBPy9BO2TFcDTi1wCBk9EcacbKv0")
                 }
             }
         }
 
         is ResultData.Error -> {
-            // Handle error state
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Error loading track: ${result.exception.message}")
             }
         }
     }
-
-
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -294,33 +299,3 @@ fun ActionButtonsPreview() {
         ActionButtons(null, "https://docs.google.com/uc?export=open&id=1IBdOyBPy9BO2TFcDTi1wCBk9EcacbKv0")
     }
 }
-
-
-//@Composable
-//fun TrackDetailScreen(
-//    trackId: String,
-//    viewModel: TrackDetailViewModel = hiltViewModel()
-//) {
-//    LaunchedEffect(trackId) {
-//        viewModel.getTrack(trackId)
-//    }
-//
-//    val trackState by viewModel.trackState.collectAsState()
-//
-//    when (trackState) {
-//        is ResultData.Loading -> {
-//            LoadingScreen()
-//        }
-//
-//        is ResultData.Success -> {
-//            val track = (trackState as ResultData.Success).data
-//            // Display track details
-//            println("Track Title: ${track.title}")
-//        }
-//
-//        is ResultData.Error -> {
-//            ErrorScreen(message = "Error: ${(trackState as ResultData.Error).exception.message}")
-//        }
-//    }
-//}
-

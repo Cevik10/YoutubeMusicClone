@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hakancevik.domain.entity.MediaPlayerState
 import com.hakancevik.youtubemusicclone.common.formatTime
 import com.hakancevik.youtubemusicclone.ui.musicplayer.service.MusicPlayerService
 
@@ -28,24 +29,39 @@ fun SliderSeekBar(serviceBinder: MusicPlayerService.MusicServiceBinder?) {
             ?: 0
     val totalTime = serviceBinder?.service?.mediaPlayerManager?.duration?.toFloat() ?: 1f
 
+    val playerState =
+        serviceBinder?.service?.mediaPlayerManager?.playerState?.collectAsState(initial = MediaPlayerState.STOPPED)?.value
+            ?: MediaPlayerState.STOPPED
+
     Column(
         modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 12.dp)
     ) {
+        // Format times for display
         val leftTime = formatTime(currentPosition.toFloat())
-        val rightTime = formatTime(totalTime - currentPosition)
+        val rightTime = formatTime(if (totalTime > 0f) totalTime - currentPosition else 0f)
+
+        // Disable slider if player is stopped or duration is invalid
+        val isSliderEnabled = playerState != MediaPlayerState.STOPPED && totalTime > 0f
 
         Slider(
-            value = currentPosition / totalTime, onValueChange = { newPosition ->
-                coroutineScope.launch {
-                    val newTime = (newPosition * totalTime).toInt()
-                    serviceBinder?.service?.seekTo(newTime)
+            value = if (totalTime > 0f) currentPosition.toFloat() / totalTime else 0f,
+            onValueChange = { newPosition ->
+                if (isSliderEnabled) {
+                    coroutineScope.launch {
+                        val newTime = (newPosition * totalTime).toInt()
+                        serviceBinder?.service?.seekTo(newTime)
+                    }
                 }
-            }, valueRange = 0f..1f, modifier = Modifier
+            },
+            enabled = isSliderEnabled,
+            valueRange = 0f..1f,
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(20.dp)
         )
         Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = leftTime,
